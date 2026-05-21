@@ -1,38 +1,50 @@
 const express = require("express");
+
 const router = express.Router();
 
 const Task = require("../models/Task");
+
 const authMiddleware = require("../middleware/authMiddleware");
 
-router.get("/", authMiddleware, async (req, res) => {
-  try {
-    const tasks = await Task.find({ createdBy: req.user.id });
+router.get(
+  "/",
+  authMiddleware,
+  async (req, res) => {
 
-    const totalTasks = tasks.length;
+    try {
 
-    const completedTasks = tasks.filter(
-      (task) => task.status === "completed"
-    ).length;
+      const tasks = await Task.find({
+        user: req.user._id,
+      });
 
-    const pendingTasks = tasks.filter(
-      (task) => task.status === "pending"
-    ).length;
+      const totalTasks = tasks.length;
 
-    const inProgressTasks = tasks.filter(
-      (task) => task.status === "in-progress"
-    ).length;
+      const completedTasks = tasks.filter(
+        (task) => task.status === "completed"
+      ).length;
 
-    res.json({
-      totalTasks,
-      completedTasks,
-      pendingTasks,
-      inProgressTasks,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+      const pendingTasks = tasks.filter(
+        (task) => task.status === "pending"
+      ).length;
+
+      const inProgressTasks = tasks.filter(
+        (task) => task.status === "in-progress"
+      ).length;
+
+      res.json({
+        totalTasks,
+        completedTasks,
+        pendingTasks,
+        inProgressTasks,
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+        message: error.message,
+      });
+    }
   }
-});
+);
 
 module.exports = router;
