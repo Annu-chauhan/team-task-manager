@@ -6,59 +6,58 @@ const protect = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+
 // CREATE PROJECT
-router.post(
-  "/",
-  protect,
-  async (req, res) => {
-    try {
+router.post("/", protect, async (req, res) => {
 
-      const { title, description } = req.body;
+  try {
 
-      const project = await Project.create({
-        title,
-        description,
-        admin: req.user._id,
-        members: [req.user._id],
-      });
+    const {
+      title,
+      description,
+    } = req.body;
 
-      res.status(201).json(project);
+    const project = await Project.create({
+      title,
+      description,
+      admin: req.user._id,
+      members: [req.user._id],
+    });
 
-    } catch (error) {
+    res.status(201).json(project);
 
-      console.log(error);
+  } catch (error) {
 
-      res.status(500).json({
-        message: error.message,
-      });
-    }
+    console.log(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
   }
-);
+});
+
 
 // GET ALL PROJECTS
-router.get(
-  "/",
-  protect,
-  async (req, res) => {
-    try {
+router.get("/", protect, async (req, res) => {
 
-      const projects = await Project.find({
-        members: req.user._id,
-      })
+  try {
+
+    const projects = await Project.find({
+      members: req.user._id,
+    })
       .populate("members", "name email")
       .populate("admin", "name email");
 
-      res.json(projects);
+    res.json(projects);
 
-    } catch (error) {
+  } catch (error) {
 
-      console.log(error);
+    console.log(error);
 
-      res.status(500).json({
-        message: error.message,
-      });
-    }
+    res.status(500).json({
+      message: error.message,
+    });
   }
-);
+});
 
 module.exports = router;
