@@ -16,7 +16,8 @@ const createTask = async (req, res) => {
     const task = await Task.create({
       title,
       description,
-      createdBy: req.user._id,
+      user: req.user._id,
+      status: "pending",
     });
 
     res.status(201).json(task);
@@ -37,11 +38,15 @@ const getTasks = async (req, res) => {
 
   try {
 
-    const tasks = await Task.find();
+    const tasks = await Task.find({
+      user: req.user._id,
+    });
 
     res.json(tasks);
 
   } catch (error) {
+
+    console.log(error);
 
     res.status(500).json({
       message: error.message,
@@ -55,7 +60,9 @@ const updateTaskStatus = async (req, res) => {
 
   try {
 
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findById(
+      req.params.id
+    );
 
     if (!task) {
 
@@ -74,6 +81,41 @@ const updateTaskStatus = async (req, res) => {
 
   } catch (error) {
 
+    console.log(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+
+// DELETE TASK
+const deleteTask = async (req, res) => {
+
+  try {
+
+    const task = await Task.findById(
+      req.params.id
+    );
+
+    if (!task) {
+
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
+
+    await task.deleteOne();
+
+    res.json({
+      message: "Task deleted successfully",
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
     res.status(500).json({
       message: error.message,
     });
@@ -85,4 +127,5 @@ module.exports = {
   createTask,
   getTasks,
   updateTaskStatus,
+  deleteTask,
 };
