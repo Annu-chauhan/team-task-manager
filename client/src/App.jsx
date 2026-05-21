@@ -5,11 +5,11 @@ import {
   Link,
 } from "react-router-dom";
 
-import Signup from "./pages/Signup";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import CreateTask from "./pages/CreateTask";
-import CreateProject from "./pages/CreateProject";
+import Signup from "./pages/Signup.jsx";
+import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import CreateTask from "./pages/CreateTask.jsx";
+import CreateProject from "./pages/CreateProject.jsx";
 
 function Home() {
 
@@ -91,13 +91,13 @@ function App() {
         />
 
         <Route
-        path="/create-task"
-        element={<CreateTask />}
+          path="/create-task"
+          element={<CreateTask />}
         />
 
         <Route
-        path="/create-project"
-        element={<CreateProject />}
+          path="/create-project"
+          element={<CreateProject />}
         />
 
       </Routes>
