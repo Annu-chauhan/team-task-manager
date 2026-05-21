@@ -15,7 +15,7 @@ function CreateProject() {
     try {
 
       await axios.post(
-        "http://localhost:5000/api/projects",
+        "https://team-task-manager-production-53bc.up.railway.app/api/projects",
         {
           title,
           description,

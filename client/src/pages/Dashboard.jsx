@@ -28,7 +28,7 @@ function Dashboard() {
     try {
 
       const res = await axios.get(
-        "http://localhost:5000/api/tasks",
+        "https://team-task-manager-production-53bc.up.railway.app/api/tasks",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -50,7 +50,7 @@ function Dashboard() {
     try {
 
       const res = await axios.get(
-        "http://localhost:5000/api/dashboard",
+        "https://team-task-manager-production-53bc.up.railway.app/api/dashboard",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -72,7 +72,7 @@ function Dashboard() {
     try {
 
       await axios.put(
-        `http://localhost:5000/api/tasks/${id}`,
+        `https://team-task-manager-production-53bc.up.railway.app/api/tasks/${id}`,
         {
           status: "completed",
         },

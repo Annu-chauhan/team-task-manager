@@ -13,7 +13,7 @@ function Login() {
     try {
 
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "https://team-task-manager-production-53bc.up.railway.app/api/auth/login",
         {
           email,
           password,
@@ -26,6 +26,7 @@ function Login() {
       );
 
       alert("Login Successful");
+
       window.location.href = "/dashboard";
 
       console.log(res.data);
@@ -40,6 +41,7 @@ function Login() {
   };
 
   return (
+
     <div
       style={{
         padding: "40px",
