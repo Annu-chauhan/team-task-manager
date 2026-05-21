@@ -27,28 +27,19 @@ function Login() {
 
       alert("Login Successful");
 
-      console.log(res.data);
-
       window.location.href = "/dashboard";
 
     } catch (error) {
 
       console.log(error);
 
-      alert(
-        error.response?.data?.message ||
-        "Login Failed"
-      );
+      alert("Login Failed");
     }
   };
 
   return (
 
-    <div
-      style={{
-        padding: "40px",
-      }}
-    >
+    <div style={{ padding: "40px" }}>
 
       <h1>Login</h1>
 
@@ -58,16 +49,12 @@ function Login() {
           type="email"
           placeholder="Enter Email"
           value={email}
-          onChange={(e) =>
-            setEmail(e.target.value)
-          }
+          onChange={(e) => setEmail(e.target.value)}
           style={{
             display: "block",
             width: "300px",
             padding: "10px",
             marginBottom: "15px",
-            border: "1px solid black",
-            borderRadius: "5px",
           }}
         />
 
@@ -75,16 +62,12 @@ function Login() {
           type="password"
           placeholder="Enter Password"
           value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
+          onChange={(e) => setPassword(e.target.value)}
           style={{
             display: "block",
             width: "300px",
             padding: "10px",
             marginBottom: "15px",
-            border: "1px solid black",
-            borderRadius: "5px",
           }}
         />
 
@@ -95,7 +78,6 @@ function Login() {
             backgroundColor: "black",
             color: "white",
             border: "none",
-            borderRadius: "5px",
             cursor: "pointer",
           }}
         >

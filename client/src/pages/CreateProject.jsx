@@ -27,7 +27,7 @@ function CreateProject() {
         }
       );
 
-      alert("Project Created Successfully");
+      alert("Project Created");
 
       setTitle("");
       setDescription("");
@@ -36,10 +36,7 @@ function CreateProject() {
 
       console.log(error);
 
-      alert(
-        error.response?.data?.message ||
-        "Project Creation Failed"
-      );
+      alert("Project Creation Failed");
     }
   };
 
@@ -55,9 +52,7 @@ function CreateProject() {
           type="text"
           placeholder="Project Title"
           value={title}
-          onChange={(e) =>
-            setTitle(e.target.value)
-          }
+          onChange={(e) => setTitle(e.target.value)}
           style={{
             display: "block",
             width: "300px",
@@ -69,9 +64,7 @@ function CreateProject() {
         <textarea
           placeholder="Project Description"
           value={description}
-          onChange={(e) =>
-            setDescription(e.target.value)
-          }
+          onChange={(e) => setDescription(e.target.value)}
           style={{
             display: "block",
             width: "300px",

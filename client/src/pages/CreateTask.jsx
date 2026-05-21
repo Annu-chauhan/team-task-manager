@@ -14,7 +14,7 @@ function CreateTask() {
 
     try {
 
-      const res = await axios.post(
+      await axios.post(
         "https://team-task-manager-production-53bc.up.railway.app/api/tasks",
         {
           title,
@@ -27,8 +27,6 @@ function CreateTask() {
         }
       );
 
-      console.log(res.data);
-
       alert("Task Created Successfully");
 
       setTitle("");
@@ -38,10 +36,7 @@ function CreateTask() {
 
       console.log(error);
 
-      alert(
-        error.response?.data?.message ||
-        "Task Creation Failed"
-      );
+      alert("Task Creation Failed");
     }
   };
 
@@ -57,9 +52,7 @@ function CreateTask() {
           type="text"
           placeholder="Task Title"
           value={title}
-          onChange={(e) =>
-            setTitle(e.target.value)
-          }
+          onChange={(e) => setTitle(e.target.value)}
           style={{
             display: "block",
             width: "300px",
@@ -71,9 +64,7 @@ function CreateTask() {
         <textarea
           placeholder="Task Description"
           value={description}
-          onChange={(e) =>
-            setDescription(e.target.value)
-          }
+          onChange={(e) => setDescription(e.target.value)}
           style={{
             display: "block",
             width: "300px",
