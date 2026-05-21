@@ -25,21 +25,16 @@ function Signup() {
 
       alert("Signup Successful");
 
-      // REDIRECT TO LOGIN
       window.location.href = "/login";
 
     } catch (error) {
 
       console.log(error);
 
-      if (error.response) {
-
-        alert(error.response.data.message);
-
-      } else {
-
-        alert("Signup Failed");
-      }
+      alert(
+        error.response?.data?.message ||
+        "Signup Failed"
+      );
     }
   };
 

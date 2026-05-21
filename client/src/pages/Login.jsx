@@ -27,16 +27,18 @@ function Login() {
 
       alert("Login Successful");
 
-      window.location.href = "/dashboard";
-
       console.log(res.data);
+
+      window.location.href = "/dashboard";
 
     } catch (error) {
 
       console.log(error);
 
-      alert("Login Failed");
-
+      alert(
+        error.response?.data?.message ||
+        "Login Failed"
+      );
     }
   };
 

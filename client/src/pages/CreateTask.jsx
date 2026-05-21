@@ -14,8 +14,6 @@ function CreateTask() {
 
     try {
 
-      console.log("TOKEN:", token);
-
       const res = await axios.post(
         "https://team-task-manager-production-53bc.up.railway.app/api/tasks",
         {
@@ -39,8 +37,6 @@ function CreateTask() {
     } catch (error) {
 
       console.log(error);
-
-      console.log(error.response);
 
       alert(
         error.response?.data?.message ||

@@ -27,7 +27,7 @@ function CreateProject() {
         }
       );
 
-      alert("Project Created");
+      alert("Project Created Successfully");
 
       setTitle("");
       setDescription("");
@@ -36,7 +36,10 @@ function CreateProject() {
 
       console.log(error);
 
-      alert("Project Creation Failed");
+      alert(
+        error.response?.data?.message ||
+        "Project Creation Failed"
+      );
     }
   };
 
