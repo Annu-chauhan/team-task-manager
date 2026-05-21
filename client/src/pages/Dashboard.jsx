@@ -92,6 +92,29 @@ function Dashboard() {
     }
   };
 
+  // DELETE TASK
+  const deleteTask = async (id) => {
+
+    try {
+
+      await axios.delete(
+        `https://team-task-manager-production-53bc.up.railway.app/api/tasks/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      fetchTasks();
+      fetchStats();
+
+    } catch (error) {
+
+      console.log(error);
+    }
+  };
+
   // LOGOUT
   const handleLogout = () => {
 
@@ -165,7 +188,8 @@ function Dashboard() {
           marginBottom: "30px",
           border: "1px solid black",
           padding: "20px",
-          borderRadius: "5px",
+          borderRadius: "10px",
+          backgroundColor: "#f4f4f4",
         }}
       >
 
@@ -195,10 +219,11 @@ function Dashboard() {
             <div
               key={task._id}
               style={{
-                border: "1px solid black",
-                padding: "15px",
-                marginBottom: "15px",
-                borderRadius: "5px",
+                border: "1px solid #ccc",
+                padding: "20px",
+                marginBottom: "20px",
+                borderRadius: "10px",
+                backgroundColor: "#f9f9f9",
               }}
             >
 
@@ -207,9 +232,17 @@ function Dashboard() {
               <p>{task.description}</p>
 
               <p>
-                Status:
-                {" "}
-                <b>{task.status}</b>
+                <strong>Status:</strong>{" "}
+                {task.status}
+              </p>
+
+              <p>
+                <strong>Created:</strong>{" "}
+                {
+                  new Date(
+                    task.createdAt
+                  ).toLocaleDateString()
+                }
               </p>
 
               <button
@@ -217,15 +250,32 @@ function Dashboard() {
                   updateStatus(task._id)
                 }
                 style={{
-                  padding: "8px 15px",
+                  padding: "10px 15px",
                   backgroundColor: "green",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  marginRight: "10px",
+                }}
+              >
+                Mark Completed
+              </button>
+
+              <button
+                onClick={() =>
+                  deleteTask(task._id)
+                }
+                style={{
+                  padding: "10px 15px",
+                  backgroundColor: "red",
                   color: "white",
                   border: "none",
                   borderRadius: "5px",
                   cursor: "pointer",
                 }}
               >
-                Mark Completed
+                Delete
               </button>
 
             </div>
