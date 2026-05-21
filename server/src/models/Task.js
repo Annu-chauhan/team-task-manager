@@ -21,23 +21,10 @@ const taskSchema = new mongoose.Schema(
       default: "pending",
     },
 
-    dueDate: {
-      type: Date,
-    },
-
-    project: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Project",
-    },
-
-    assignedTo: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-    },
-
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      required: true,
     },
   },
   {
