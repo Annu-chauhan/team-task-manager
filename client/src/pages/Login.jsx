@@ -83,6 +83,20 @@ function Login() {
         >
           Login
         </button>
+        <button
+  onClick={() => window.location.href = "/"}
+  style={{
+    marginTop: "20px",
+    padding: "10px 20px",
+    backgroundColor: "gray",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+  }}
+>
+  ← Back
+</button>
 
       </form>
 

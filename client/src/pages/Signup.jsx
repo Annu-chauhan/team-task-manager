@@ -95,6 +95,21 @@ function Signup() {
           Signup
         </button>
 
+        <button
+  onClick={() => window.location.href = "/login"}
+  style={{
+    marginTop: "20px",
+    padding: "10px 20px",
+    backgroundColor: "gray",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+  }}
+>
+  ← Go to Login
+</button>
+
       </form>
 
     </div>
