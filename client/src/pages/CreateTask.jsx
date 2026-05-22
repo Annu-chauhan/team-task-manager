@@ -87,6 +87,21 @@ function CreateTask() {
           Create Task
         </button>
 
+        <button
+  onClick={() => window.location.href = "/dashboard"}
+  style={{
+    marginTop: "20px",
+    padding: "10px 20px",
+    backgroundColor: "gray",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+  }}
+>
+  ← Back to Dashboard
+</button>
+
       </form>
 
     </div>

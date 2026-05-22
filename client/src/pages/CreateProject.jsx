@@ -82,9 +82,26 @@ function CreateProject() {
             color: "white",
             border: "none",
             cursor: "pointer",
+            borderRadius: "5px",
+            marginRight: "10px",
           }}
         >
           Create Project
+        </button>
+
+        <button
+          type="button"
+          onClick={() => window.location.href = "/dashboard"}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "gray",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          ← Back to Dashboard
         </button>
 
       </form>
