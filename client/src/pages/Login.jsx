@@ -53,8 +53,10 @@ function Login() {
           style={{
             display: "block",
             width: "300px",
-            padding: "10px",
+            padding: "12px",
             marginBottom: "15px",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
           }}
         />
 
@@ -66,37 +68,57 @@ function Login() {
           style={{
             display: "block",
             width: "300px",
-            padding: "10px",
+            padding: "12px",
             marginBottom: "15px",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
           }}
         />
 
-        <button
-          type="submit"
+        <div
           style={{
-            padding: "10px 20px",
-            backgroundColor: "black",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
+            display: "flex",
+            gap: "15px",
+            marginTop: "20px",
           }}
         >
-          Login
-        </button>
-        <button
-  onClick={() => window.location.href = "/"}
-  style={{
-    marginTop: "20px",
-    padding: "10px 20px",
-    backgroundColor: "gray",
-    color: "white",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  }}
->
-  ← Back
-</button>
+
+          <button
+            type="submit"
+            style={{
+              padding: "12px 28px",
+              background: "linear-gradient(135deg, #000000, #434343)",
+              color: "white",
+              border: "none",
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontSize: "16px",
+              fontWeight: "600",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+            }}
+          >
+            Login
+          </button>
+
+          <button
+            type="button"
+            onClick={() => window.location.href = "/"}
+            style={{
+              padding: "12px 28px",
+              background: "linear-gradient(135deg, #667eea, #764ba2)",
+              color: "white",
+              border: "none",
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontSize: "16px",
+              fontWeight: "600",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+            }}
+          >
+            ← Back
+          </button>
+
+        </div>
 
       </form>
 
