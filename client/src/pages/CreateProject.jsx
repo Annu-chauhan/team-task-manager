@@ -1,130 +1,127 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import API_URL from "../config";
+import Navbar from "../components/Navbar";
+import Toast from "../components/Toast";
 
 function CreateProject() {
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
 
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   const handleCreateProject = async (e) => {
-
     e.preventDefault();
+    if (!title.trim()) {
+      setToast({ message: "Project title is required", type: "error" });
+      return;
+    }
 
+    setLoading(true);
     try {
-
       await axios.post(
-        "https://team-task-manager-production-53bc.up.railway.app/api/projects",
+        `${API_URL}/api/projects`,
         {
           title,
           description,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      alert("Project Created");
-
-      setTitle("");
-      setDescription("");
-
+      setToast({ message: "Project created successfully!", type: "success" });
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
     } catch (error) {
-
-      console.log(error);
-
-      alert("Project Creation Failed");
+      console.error(error);
+      const msg = error.response?.data?.message || "Failed to create project";
+      setToast({ message: msg, type: "error" });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-
-    <div style={{ padding: "40px" }}>
-
-      <h1>Create Project</h1>
-
-      <form onSubmit={handleCreateProject}>
-
-        <input
-          type="text"
-          placeholder="Project Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={{
-            display: "block",
-            width: "300px",
-            padding: "12px",
-            marginBottom: "15px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-          }}
+    <div className="flex flex-col min-h-screen bg-dark-bg text-dark-text relative overflow-hidden">
+      <Navbar />
+      
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
+      )}
 
-        <textarea
-          placeholder="Project Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          style={{
-            display: "block",
-            width: "300px",
-            height: "100px",
-            padding: "12px",
-            marginBottom: "15px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-          }}
-        />
+      {/* Decorative background glow */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-indigo-500/5 blur-3xl -z-10" />
 
-        <div
-          style={{
-            display: "flex",
-            gap: "15px",
-            marginTop: "20px",
-          }}
-        >
+      <main className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md p-8 rounded-2xl glass-panel relative border border-dark-border/80 shadow-2xl animate-fade-in">
+          
+          <div className="mb-8">
+            <h2 className="text-2xl font-extrabold text-white">Create Workspace</h2>
+            <p className="text-sm text-dark-muted mt-1">
+              Set up a shared project folder to collaborate with your team
+            </p>
+          </div>
 
-          <button
-            type="submit"
-            style={{
-              padding: "12px 28px",
-              background: "linear-gradient(135deg, #000000, #434343)",
-              color: "white",
-              border: "none",
-              borderRadius: "10px",
-              cursor: "pointer",
-              fontSize: "16px",
-              fontWeight: "600",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-            }}
-          >
-            Create Project
-          </button>
+          <form onSubmit={handleCreateProject} className="space-y-5">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-dark-muted mb-2">
+                Project Name
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Q3 Product Launch"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                disabled={loading}
+                className="w-full px-4 py-3 rounded-xl custom-input text-sm"
+                required
+              />
+            </div>
 
-          <button
-            type="button"
-            onClick={() => window.location.href = "/dashboard"}
-            style={{
-              padding: "12px 28px",
-              background: "linear-gradient(135deg, #667eea, #764ba2)",
-              color: "white",
-              border: "none",
-              borderRadius: "10px",
-              cursor: "pointer",
-              fontSize: "16px",
-              fontWeight: "600",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-            }}
-          >
-            ← Back to Dashboard
-          </button>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-dark-muted mb-2">
+                Description
+              </label>
+              <textarea
+                placeholder="Explain the objectives, deliverables, and timelines of this workspace..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                disabled={loading}
+                className="w-full px-4 py-3 rounded-xl custom-input text-sm h-28 resize-none"
+              />
+            </div>
+
+            <div className="flex gap-4 pt-2">
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard")}
+                className="flex-1 py-3 text-sm font-semibold rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 py-3 rounded-xl gradient-btn font-bold text-white shadow-lg active:scale-98 transition-all flex items-center justify-center disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+              >
+                Create Project
+              </button>
+            </div>
+          </form>
 
         </div>
-
-      </form>
-
+      </main>
     </div>
   );
 }

@@ -1,127 +1,121 @@
 const Task = require("../models/Task");
-
+const Project = require("../models/Project");
 
 // CREATE TASK
-const createTask = async (req, res) => {
-
+const createTask = async (req, res, next) => {
   try {
+    const { title, description, project } = req.body;
 
-    console.log("USER:", req.user);
+    if (!title || title.trim() === "") {
+      return res.status(400).json({ message: "Task title is required" });
+    }
 
-    const {
-      title,
-      description,
-    } = req.body;
+    // If project is specified, verify project exists and user is a member
+    if (project) {
+      const proj = await Project.findById(project);
+      if (!proj) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      if (!proj.members.includes(req.user._id)) {
+        return res.status(403).json({ message: "Not authorized: You are not a member of this project" });
+      }
+    }
 
     const task = await Task.create({
       title,
       description,
       user: req.user._id,
+      project: project || undefined,
       status: "pending",
     });
 
     res.status(201).json(task);
-
   } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
   }
 };
-
 
 // GET TASKS
-const getTasks = async (req, res) => {
-
+const getTasks = async (req, res, next) => {
   try {
+    const { project } = req.query;
+    let query = { user: req.user._id };
 
-    const tasks = await Task.find({
-      user: req.user._id,
-    });
-
-    res.json(tasks);
-
-  } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
-
-
-// UPDATE TASK STATUS
-const updateTaskStatus = async (req, res) => {
-
-  try {
-
-    const task = await Task.findById(
-      req.params.id
-    );
-
-    if (!task) {
-
-      return res.status(404).json({
-        message: "Task not found",
-      });
+    if (project) {
+      const proj = await Project.findById(project);
+      if (!proj) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      if (!proj.members.includes(req.user._id)) {
+        return res.status(403).json({ message: "Not authorized: You are not a member of this project" });
+      }
+      // Return all tasks in this project
+      query = { project };
     }
 
-    task.status =
-      req.body.status || task.status;
+    const tasks = await Task.find(query)
+      .populate("user", "name email")
+      .populate("project", "title");
 
-    const updatedTask =
-      await task.save();
-
-    res.json(updatedTask);
-
+    res.json(tasks);
   } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
   }
 };
 
-
-// DELETE TASK
-const deleteTask = async (req, res) => {
-
+// UPDATE TASK STATUS / CONTENT
+const updateTaskStatus = async (req, res, next) => {
   try {
-
-    const task = await Task.findById(
-      req.params.id
-    );
+    const task = await Task.findById(req.params.id);
 
     if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
 
-      return res.status(404).json({
-        message: "Task not found",
-      });
+    // Enforce authorization: only the task owner can edit
+    if (task.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized: You do not own this task" });
+    }
+
+    const { title, description, status } = req.body;
+
+    if (title !== undefined) task.title = title;
+    if (description !== undefined) task.description = description;
+    if (status !== undefined) {
+      if (!["pending", "in-progress", "completed"].includes(status)) {
+        return res.status(400).json({ message: "Invalid status value" });
+      }
+      task.status = status;
+    }
+
+    const updatedTask = await task.save();
+    res.json(updatedTask);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE TASK
+const deleteTask = async (req, res, next) => {
+  try {
+    const task = await Task.findById(req.params.id);
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    // Enforce authorization: only the task owner can delete
+    if (task.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized: You do not own this task" });
     }
 
     await task.deleteOne();
 
-    res.json({
-      message: "Task deleted successfully",
-    });
-
+    res.json({ message: "Task deleted successfully" });
   } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
   }
 };
-
 
 module.exports = {
   createTask,

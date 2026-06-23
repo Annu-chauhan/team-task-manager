@@ -39,6 +39,9 @@ const signup = async (req, res) => {
       role,
     });
 
+    // Exclude password from output
+    user.password = undefined;
+
     res.status(201).json({
       message: "Signup Successful",
       user,
@@ -97,6 +100,9 @@ const login = async (req, res) => {
         expiresIn: "7d",
       }
     );
+
+    // Exclude password from output
+    user.password = undefined;
 
     res.json({
       message: "Login Successful",
