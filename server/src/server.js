@@ -67,9 +67,18 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/projects", projectRoutes);
 
-// TEST ROUTE
-app.get("/", (req, res) => {
-  res.json({ message: "Team Task Manager API is running securely." });
+const path = require("path");
+
+// Serve static assets in production
+app.use(express.static(path.join(__dirname, "../public")));
+
+// CATCH-ALL ROUTE FOR REACT SPA ROUTING
+app.get("*", (req, res) => {
+  // If request is for an API, return a 404 instead of index.html
+  if (req.originalUrl.startsWith("/api")) {
+    return res.status(404).json({ message: "API endpoint not found" });
+  }
+  res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
 // CENTRALIZED ERROR HANDLING MIDDLEWARE
