@@ -18,6 +18,9 @@ function Dashboard() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
 
+  // Drag & Drop State
+  const [draggedOverColumn, setDraggedOverColumn] = useState(null); // 'pending' | 'in-progress' | 'completed' | null
+
   // Form States
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDesc, setTaskDesc] = useState("");
@@ -185,21 +188,16 @@ function Dashboard() {
     }
   };
 
-  // UPDATE STATUS
-  const handleStatusChange = async (id, currentStatus) => {
-    let nextStatus = "pending";
-    if (currentStatus === "pending") nextStatus = "in-progress";
-    else if (currentStatus === "in-progress") nextStatus = "completed";
-
+  // UPDATE STATUS (Unified function for drag-drop and buttons)
+  const updateTaskStatus = async (id, targetStatus) => {
     try {
       await axios.put(
         `${API_URL}/api/tasks/${id}`,
-        { status: nextStatus },
+        { status: targetStatus },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       fetchTasks();
     } catch (error) {
       console.error(error);
@@ -208,22 +206,52 @@ function Dashboard() {
     }
   };
 
+  const handleStatusChange = async (id, currentStatus) => {
+    let nextStatus = "pending";
+    if (currentStatus === "pending") nextStatus = "in-progress";
+    else if (currentStatus === "in-progress") nextStatus = "completed";
+    await updateTaskStatus(id, nextStatus);
+  };
+
   // REOPEN TASK (Move back to in-progress)
   const handleReopenTask = async (id) => {
-    try {
-      await axios.put(
-        `${API_URL}/api/tasks/${id}`,
-        { status: "in-progress" },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+    await updateTaskStatus(id, "in-progress");
+  };
 
-      fetchTasks();
-    } catch (error) {
-      console.error(error);
-      const msg = error.response?.data?.message || "Unauthorized to update task";
-      setToast({ message: msg, type: "error" });
+  // DRAG & DROP HANDLERS
+  const handleDragStart = (e, taskId) => {
+    e.dataTransfer.setData("text/plain", taskId);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e, columnStatus) => {
+    e.preventDefault();
+    setDraggedOverColumn(columnStatus);
+  };
+
+  const handleDragLeave = () => {
+    setDraggedOverColumn(null);
+  };
+
+  const handleDrop = async (e, targetStatus) => {
+    e.preventDefault();
+    setDraggedOverColumn(null);
+    const taskId = e.dataTransfer.getData("text/plain");
+    if (!taskId) return;
+    
+    // Find the task to see if status actually changed and if the user owns it
+    const task = tasks.find(t => t._id === taskId);
+    if (!task) return;
+    
+    // Check ownership before trying to update status to prevent errors
+    const isOwner = task.user?._id === currentUser?.id || task.user === currentUser?.id;
+    if (!isOwner) {
+      setToast({ message: "You can only drag tasks that you own", type: "error" });
+      return;
+    }
+
+    if (task.status !== targetStatus) {
+      await updateTaskStatus(taskId, targetStatus);
     }
   };
 
@@ -453,7 +481,16 @@ function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 items-start">
               
               {/* PENDING COLUMN */}
-              <div className="flex flex-col gap-4 p-4 rounded-2xl bg-black/15 border border-dark-border/40 min-h-[450px]">
+              <div 
+                onDragOver={(e) => handleDragOver(e, "pending")}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, "pending")}
+                className={`flex flex-col gap-4 p-4 rounded-2xl transition-all duration-200 min-h-[450px] border-2 ${
+                  draggedOverColumn === "pending"
+                    ? "bg-indigo-500/10 border-dashed border-indigo-500/50 scale-[1.01]"
+                    : "bg-black/15 border-dark-border/40"
+                }`}
+              >
                 <div className="flex justify-between items-center px-1 border-b border-dark-border/40 pb-2">
                   <div className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
@@ -477,6 +514,7 @@ function Dashboard() {
                         onStatusChange={handleStatusChange}
                         onDelete={triggerDeleteTask}
                         currentUser={currentUser}
+                        onDragStart={handleDragStart}
                       />
                     ))
                   )}
@@ -484,7 +522,16 @@ function Dashboard() {
               </div>
 
               {/* IN PROGRESS COLUMN */}
-              <div className="flex flex-col gap-4 p-4 rounded-2xl bg-black/15 border border-dark-border/40 min-h-[450px]">
+              <div 
+                onDragOver={(e) => handleDragOver(e, "in-progress")}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, "in-progress")}
+                className={`flex flex-col gap-4 p-4 rounded-2xl transition-all duration-200 min-h-[450px] border-2 ${
+                  draggedOverColumn === "in-progress"
+                    ? "bg-indigo-500/10 border-dashed border-indigo-500/50 scale-[1.01]"
+                    : "bg-black/15 border-dark-border/40"
+                }`}
+              >
                 <div className="flex justify-between items-center px-1 border-b border-dark-border/40 pb-2">
                   <div className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" />
@@ -508,6 +555,7 @@ function Dashboard() {
                         onStatusChange={handleStatusChange}
                         onDelete={triggerDeleteTask}
                         currentUser={currentUser}
+                        onDragStart={handleDragStart}
                       />
                     ))
                   )}
@@ -515,7 +563,16 @@ function Dashboard() {
               </div>
 
               {/* COMPLETED COLUMN */}
-              <div className="flex flex-col gap-4 p-4 rounded-2xl bg-black/15 border border-dark-border/40 min-h-[450px]">
+              <div 
+                onDragOver={(e) => handleDragOver(e, "completed")}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, "completed")}
+                className={`flex flex-col gap-4 p-4 rounded-2xl transition-all duration-200 min-h-[450px] border-2 ${
+                  draggedOverColumn === "completed"
+                    ? "bg-indigo-500/10 border-dashed border-indigo-500/50 scale-[1.01]"
+                    : "bg-black/15 border-dark-border/40"
+                }`}
+              >
                 <div className="flex justify-between items-center px-1 border-b border-dark-border/40 pb-2">
                   <div className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
@@ -540,6 +597,7 @@ function Dashboard() {
                         onReopen={handleReopenTask}
                         onDelete={triggerDeleteTask}
                         currentUser={currentUser}
+                        onDragStart={handleDragStart}
                       />
                     ))
                   )}
@@ -709,13 +767,21 @@ function Dashboard() {
 }
 
 // INTERNAL TASK CARD COMPONENT
-function TaskCard({ task, onStatusChange, onReopen, onDelete, currentUser }) {
+function TaskCard({ task, onStatusChange, onReopen, onDelete, currentUser, onDragStart }) {
   // Check ownership
   const ownsTask = task.user?._id === currentUser?.id || task.user === currentUser?.id;
   const isCompleted = task.status === "completed";
 
   return (
-    <div className="w-full p-4 rounded-xl border border-dark-border/60 bg-dark-card hover:border-dark-border transition-all flex flex-col gap-3 group shadow-md hover:shadow-lg">
+    <div 
+      draggable={ownsTask}
+      onDragStart={(e) => onDragStart(e, task._id)}
+      className={`w-full p-4 rounded-xl border border-dark-border/60 bg-dark-card transition-all flex flex-col gap-3 group shadow-md hover:shadow-lg ${
+        ownsTask
+          ? "cursor-grab active:cursor-grabbing hover:border-indigo-500/50"
+          : "hover:border-dark-border opacity-80"
+      }`}
+    >
       <div className="flex justify-between items-start gap-2">
         <h4 className="font-bold text-sm text-white group-hover:text-indigo-400 transition-colors leading-tight">
           {task.title}
