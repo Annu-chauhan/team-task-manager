@@ -17,9 +17,6 @@ jobs:
           lfs: true
 
       - name: Push to Hugging Face
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Configured for Parul06/TTM
-          git remote add hf https://Parul06:$HF_TOKEN@huggingface.co/spaces/Parul06/TTM
+          git remote add hf https://Parul06:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Parul06/TTM
           git push --force hf main:main
