@@ -286,6 +286,11 @@ function Dashboard() {
   const inProgressTasks = tasks.filter((t) => t.status === "in-progress");
   const completedTasks = tasks.filter((t) => t.status === "completed");
 
+  // Visual Gauge calculations
+  const completionRate = totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
+  const strokeDasharray = 314.16;
+  const strokeDashoffset = strokeDasharray - (strokeDasharray * completionRate) / 100;
+
   return (
     <div className="flex flex-col min-h-screen bg-dark-bg text-dark-text relative">
       <Navbar />
@@ -445,28 +450,138 @@ function Dashboard() {
             </button>
           </div>
 
-          {/* Statistics Grid */}
-          <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl glass-panel border border-dark-border/50">
-              <span className="text-xs text-dark-muted font-semibold uppercase tracking-wider">Total Tasks</span>
-              <p className="text-2xl font-black text-white mt-1">{totalTasks}</p>
-            </div>
+          {/* Statistics Grid & Visual Gauge */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <div className="p-4 rounded-xl glass-panel border border-dark-border/50 border-l-amber-500/40">
-              <span className="text-xs text-amber-400 font-semibold uppercase tracking-wider">Pending</span>
-              <p className="text-2xl font-black text-white mt-1">{pendingTasks.length}</p>
+            {/* Completion Gauge Card */}
+            <div className="lg:col-span-1 p-6 rounded-2xl glass-panel border border-dark-border/50 flex items-center justify-between gap-6 shadow-xl relative overflow-hidden group">
+              {/* Backglow accent */}
+              <div className="absolute -right-10 -bottom-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all duration-500" />
+              
+              <div className="flex flex-col gap-2">
+                <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-wider">
+                  Project Progress
+                </h3>
+                <p className="text-2xl font-black text-white mt-1">
+                  {completionRate}% Done
+                </p>
+                <span className="text-xs text-dark-muted leading-relaxed">
+                  {completedTasks.length} of {totalTasks} tasks completed
+                </span>
+              </div>
+
+              {/* Circular SVG Gauge */}
+              <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                  <defs>
+                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#4f46e5" />
+                      <stop offset="100%" stopColor="#06b6d4" />
+                    </linearGradient>
+                  </defs>
+                  {/* Background track circle */}
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="50"
+                    className="stroke-dark-border/60 fill-none"
+                    strokeWidth="10"
+                  />
+                  {/* Active progress circle */}
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="50"
+                    className="stroke-[url(#progressGradient)] fill-none transition-all duration-1000 ease-out"
+                    strokeWidth="10"
+                    strokeDasharray={strokeDasharray}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                {/* Center text */}
+                <div className="absolute text-center flex flex-col items-center">
+                  <span className="text-base font-extrabold text-white leading-none">
+                    {completionRate}%
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <div className="p-4 rounded-xl glass-panel border border-dark-border/50 border-l-indigo-500/40">
-              <span className="text-xs text-indigo-400 font-semibold uppercase tracking-wider">In Progress</span>
-              <p className="text-2xl font-black text-white mt-1">{inProgressTasks.length}</p>
-            </div>
+            {/* Individual Status Cards */}
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              
+              {/* Pending Card */}
+              <div className="p-5 rounded-2xl glass-panel border border-dark-border/50 flex flex-col justify-between hover:border-amber-500/30 transition-all duration-300">
+                <div>
+                  <span className="text-xs text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-amber-500" />
+                    Pending
+                  </span>
+                  <p className="text-3xl font-black text-white mt-3">{pendingTasks.length}</p>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between text-[10px] text-dark-muted mb-1 font-semibold">
+                    <span>Ratio</span>
+                    <span>{totalTasks > 0 ? Math.round((pendingTasks.length / totalTasks) * 100) : 0}%</span>
+                  </div>
+                  <div className="w-full bg-black/35 rounded-full h-1.5 overflow-hidden">
+                    <div 
+                      className="bg-amber-500 h-1.5 rounded-full transition-all duration-700" 
+                      style={{ width: `${totalTasks > 0 ? (pendingTasks.length / totalTasks) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
 
-            <div className="p-4 rounded-xl glass-panel border border-dark-border/50 border-l-emerald-500/40">
-              <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Completed</span>
-              <p className="text-2xl font-black text-white mt-1">{completedTasks.length}</p>
+              {/* In Progress Card */}
+              <div className="p-5 rounded-2xl glass-panel border border-dark-border/50 flex flex-col justify-between hover:border-indigo-500/30 transition-all duration-300">
+                <div>
+                  <span className="text-xs text-indigo-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                    In Progress
+                  </span>
+                  <p className="text-3xl font-black text-white mt-3">{inProgressTasks.length}</p>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between text-[10px] text-dark-muted mb-1 font-semibold">
+                    <span>Ratio</span>
+                    <span>{totalTasks > 0 ? Math.round((inProgressTasks.length / totalTasks) * 100) : 0}%</span>
+                  </div>
+                  <div className="w-full bg-black/35 rounded-full h-1.5 overflow-hidden">
+                    <div 
+                      className="bg-indigo-500 h-1.5 rounded-full transition-all duration-700" 
+                      style={{ width: `${totalTasks > 0 ? (inProgressTasks.length / totalTasks) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Completed Card */}
+              <div className="p-5 rounded-2xl glass-panel border border-dark-border/50 flex flex-col justify-between hover:border-emerald-500/30 transition-all duration-300">
+                <div>
+                  <span className="text-xs text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    Completed
+                  </span>
+                  <p className="text-3xl font-black text-white mt-3">{completedTasks.length}</p>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between text-[10px] text-dark-muted mb-1 font-semibold">
+                    <span>Ratio</span>
+                    <span>{totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0}%</span>
+                  </div>
+                  <div className="w-full bg-black/35 rounded-full h-1.5 overflow-hidden">
+                    <div 
+                      className="bg-emerald-500 h-1.5 rounded-full transition-all duration-700" 
+                      style={{ width: `${totalTasks > 0 ? (completedTasks.length / totalTasks) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
             </div>
-          </section>
+          </div>
 
           {/* KANBAN BOARD */}
           {loading ? (
