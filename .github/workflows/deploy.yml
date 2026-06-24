@@ -20,6 +20,6 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Replace Annu-chauhan and team-task-manager if your HF username/space name differs
-          git remote add hf https://Annu-chauhan:$HF_TOKEN@huggingface.co/spaces/Annu-chauhan/team-task-manager
+          # Configured for Parul06/TTM
+          git remote add hf https://Parul06:$HF_TOKEN@huggingface.co/spaces/Parul06/TTM
           git push --force hf main:main
